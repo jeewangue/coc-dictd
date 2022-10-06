@@ -1,0 +1,77 @@
+{
+  "name": "coc-dictd",
+  "version": "0.1.0",
+  "description": "dictd extension for coc.nvim",
+  "author": "Jee Wan Gue <jeewangue@gmail.com>",
+  "homepage": "https://github.com/jeewangue/coc-dictd",
+  "repository": "git@github.com:jeewangue/coc-dictd.git",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "keywords": [
+    "coc.nvim"
+  ],
+  "engines": {
+    "coc": "^0.0.80"
+  },
+  "scripts": {
+    "lint": "eslint src --ext ts",
+    "clean": "rimraf lib",
+    "watch": "node esbuild.js --watch",
+    "build": "node esbuild.js",
+    "prepare": "node esbuild.js"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 120,
+    "semi": true
+  },
+  "dependencies": {
+    "coc-helper": "^0.15.2",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.6",
+    "@types/node": "^18.8.0",
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.13.0",
+    "coc.nvim": "^0.0.80",
+    "esbuild": "^0.14.24",
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.6.2"
+  },
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "coc-dictd configuration",
+      "properties": {
+        "coc-dictd.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable coc-dictd extension"
+        },
+        "coc-dictd.timeout": {
+          "type": "number",
+          "default": "5000",
+          "description": "The timeout in milliseconds for search"
+        },
+        "coc-dictd.server": {
+          "type": "string",
+          "default": "dict.org",
+          "description": "The server address using DICT protocol. (If you are using `dictd` as a local service, the server is `localhost`)"
+        },
+        "coc-dictd.databases": {
+          "type": "string",
+          "default": "*",
+          "description": "database to be used in DICT protocol. `*` means all databases"
+        }
+      }
+    }
+  }
+}
