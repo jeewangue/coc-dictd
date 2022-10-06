@@ -1,6 +1,6 @@
 {
   "name": "coc-dictd",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "dictd extension for coc.nvim",
   "author": "Jee Wan Gue <jeewangue@gmail.com>",
   "homepage": "https://github.com/jeewangue/coc-dictd",
