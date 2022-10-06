@@ -10,7 +10,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   await activateHelper(context);
   logger.info('coc-dictd works!');
 
-  const config = workspace.getConfiguration();
+  const config = workspace.getConfiguration('coc-dictd');
   if (config.has('server')) {
     extConfig.server = config.get('server', 'dict.org');
   }
