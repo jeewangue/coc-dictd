@@ -2,7 +2,7 @@ import { activateHelper } from 'coc-helper';
 import { Documentation, ExtensionContext, FloatFactory, FloatWinConfig, window, workspace } from 'coc.nvim';
 import { map, uniq } from 'lodash-es';
 import util from 'util';
-import { extConfig } from './config';
+import { extConfig, setExtConfig } from './config';
 import { getDefs, getMatches } from './dict';
 import { logger } from './logger';
 import { translate } from './translate';
@@ -11,14 +11,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
   await activateHelper(context);
   logger.info('coc-dictd works!');
 
-  const config = workspace.getConfiguration('coc-dictd');
-  extConfig.server = config.get('server', 'dict.org');
-  extConfig.timeout = parseInt(config.get('timeout', '5000'));
-  extConfig.databases = config.get('databases', '*');
-
-  extConfig.translate.formality = config.get('translate.formality', 'none');
-  extConfig.translate.sourceLanguageCode = config.get('translate.sourceLanguageCode', 'auto');
-  extConfig.translate.targetLanguageCode = config.get('translate.targetLanguageCode', 'en');
+  {
+    const c = workspace.getConfiguration('coc-dictd');
+    setExtConfig(c);
+  }
 
   const ff = new FloatFactory(workspace.nvim);
   const floatConfig: FloatWinConfig = {
@@ -26,6 +22,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
   };
 
   context.subscriptions.push(
+    workspace.onDidChangeConfiguration((ev) => {
+      logger.debug('config changed');
+      if (ev.affectsConfiguration('coc-dictd')) {
+        logger.debug('config change affected coc-dictd');
+        const c = workspace.getConfiguration('coc-dictd');
+        setExtConfig(c);
+      }
+    }),
     workspace.registerKeymap(
       ['n'],
       'dictd-search',
