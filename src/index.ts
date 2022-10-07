@@ -1,25 +1,24 @@
-import util from 'util';
+import { activateHelper } from 'coc-helper';
 import { Documentation, ExtensionContext, FloatFactory, FloatWinConfig, window, workspace } from 'coc.nvim';
 import { map, uniq } from 'lodash-es';
+import util from 'util';
+import { extConfig } from './config';
 import { getDefs, getMatches } from './dict';
 import { logger } from './logger';
-import { activateHelper } from 'coc-helper';
-import { extConfig } from './config';
+import { translate } from './translate';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   await activateHelper(context);
   logger.info('coc-dictd works!');
 
   const config = workspace.getConfiguration('coc-dictd');
-  if (config.has('server')) {
-    extConfig.server = config.get('server', 'dict.org');
-  }
-  if (config.has('timeout')) {
-    extConfig.timeout = parseInt(config.get('timeout', '5000'));
-  }
-  if (config.has('databases')) {
-    extConfig.databases = config.get('databases', '*');
-  }
+  extConfig.server = config.get('server', 'dict.org');
+  extConfig.timeout = parseInt(config.get('timeout', '5000'));
+  extConfig.databases = config.get('databases', '*');
+
+  extConfig.translate.formality = config.get('translate.formality', 'none');
+  extConfig.translate.sourceLanguageCode = config.get('translate.sourceLanguageCode', 'auto');
+  extConfig.translate.targetLanguageCode = config.get('translate.targetLanguageCode', 'en');
 
   const ff = new FloatFactory(workspace.nvim);
   const floatConfig: FloatWinConfig = {
@@ -31,6 +30,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
       ['n'],
       'dictd-search',
       async () => {
+        logger.info('coc-dictd-search');
         let word = (await workspace.nvim.eval('expand("<cword>")')) as string;
         {
           const res = await getDefs(word);
@@ -85,6 +85,64 @@ export async function activate(context: ExtensionContext): Promise<void> {
           } else {
             return ff.show([{ filetype: 'markdown', content: `No definition found for \`${word}\`.` }], floatConfig);
           }
+        }
+      },
+      { sync: false }
+    ),
+    workspace.registerKeymap(
+      ['n'],
+      'dictd-translate',
+      async () => {
+        logger.info('coc-dictd-translate');
+        const word = (await workspace.nvim.eval('expand("<cword>")')) as string;
+        {
+          const res = await translate({
+            formality: extConfig.translate.formality,
+            sourceLanguageCode: extConfig.translate.sourceLanguageCode,
+            targetLanguageCode: extConfig.translate.targetLanguageCode,
+            text: word,
+          });
+          logger.debug('translate');
+          logger.debug(util.inspect(res));
+          const docs = [{ filetype: 'log', content: res }];
+          return ff.show(docs, floatConfig);
+        }
+      },
+      { sync: false }
+    ),
+    workspace.registerKeymap(
+      ['v'],
+      'dictd-translate-selected',
+      async () => {
+        logger.info('coc-dictd-translate-selected');
+        const range = await window.getSelectedRange('v');
+        if (range === null) {
+          logger.warn('range is empty');
+          return;
+        }
+
+        const doc = await workspace.document;
+        const lines = doc.getLines(range.start.line, range.end.line + 1);
+        if (lines.length === 0) {
+          logger.warn('no lines are selected');
+          return;
+        }
+        lines[lines.length - 1] = lines[lines.length - 1].slice(0, range.end.character);
+        lines[0] = lines[0].slice(range.start.character);
+
+        const text = lines.join('\n');
+        logger.info(`selected text: ${util.inspect(text)}`);
+        {
+          const res = await translate({
+            formality: extConfig.translate.formality,
+            sourceLanguageCode: extConfig.translate.sourceLanguageCode,
+            targetLanguageCode: extConfig.translate.targetLanguageCode,
+            text: text,
+          });
+          logger.debug('translate');
+          logger.debug(util.inspect(res));
+          const docs = [{ filetype: 'log', content: res }];
+          return ff.show(docs, floatConfig);
         }
       },
       { sync: false }

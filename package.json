@@ -1,6 +1,6 @@
 {
   "name": "coc-dictd",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "dictd extension for coc.nvim",
   "author": "Jee Wan Gue <jeewangue@gmail.com>",
   "homepage": "https://github.com/jeewangue/coc-dictd",
@@ -26,6 +26,7 @@
     "semi": true
   },
   "dependencies": {
+    "@aws-sdk/client-translate": "^3.186.0",
     "coc-helper": "^0.15.2",
     "lodash-es": "^4.17.21"
   },
@@ -70,6 +71,26 @@
           "type": "string",
           "default": "*",
           "description": "database to be used in DICT protocol. `*` means all databases"
+        },
+        "coc-dictd.translate.formality": {
+          "type": "string",
+          "default": "none",
+          "enum": [
+            "formal",
+            "informal",
+            "none"
+          ],
+          "description": "The formality level of the output text and the option to mask profane words and phrases."
+        },
+        "coc-dictd.translate.sourceLanguageCode": {
+          "type": "string",
+          "default": "auto",
+          "description": "The language code for the language of the source text. To have Amazon Translate determine the source language of your text, you can specify <code>auto</code>"
+        },
+        "coc-dictd.translate.targetLanguageCode": {
+          "type": "string",
+          "default": "en",
+          "description": "The language code requested for the language of the target text."
         }
       }
     }
