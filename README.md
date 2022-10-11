@@ -9,8 +9,6 @@ Search words or similar words using DICT protocol (RFC 2229).
 ## Keymaps
 
 `nnoremap <silent> <leader>ds <Plug>(coc-dictd-search)`
-`nnoremap <silent> <leader>dt <Plug>(coc-dictd-translate)`
-`vnoremap <silent> <leader>dt <Plug>(coc-dictd-translate-selected)`
 
 ## License
 
